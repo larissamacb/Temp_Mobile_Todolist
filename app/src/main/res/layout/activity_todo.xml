@@ -58,6 +58,25 @@
             android:paddingTop="20dp"
             android:paddingBottom="4dp" />
 
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp"
+            android:background="@drawable/search_background"
+            android:hint="Pesquisar tarefas..."
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:inputType="text"
+            android:imeOptions="actionSearch"
+            android:maxLines="1" />
+
         <TextView
             android:id="@+id/tvEmpty"
             android:layout_width="match_parent"

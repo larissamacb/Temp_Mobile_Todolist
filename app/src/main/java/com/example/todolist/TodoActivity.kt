@@ -2,7 +2,10 @@ package com.example.todolist
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -19,6 +22,7 @@ class TodoActivity : AppCompatActivity() {
     private lateinit var fabAdd: FloatingActionButton
     private lateinit var tvEmpty: TextView
     private lateinit var tvWelcome: TextView
+    private lateinit var etSearch: EditText
     private lateinit var todoDao: TodoDao
     private lateinit var adapter: TodoAdapter
     private var userId: Int = 0
@@ -36,6 +40,7 @@ class TodoActivity : AppCompatActivity() {
         fabAdd = findViewById(R.id.fabAdd)
         tvEmpty = findViewById(R.id.tvEmpty)
         tvWelcome = findViewById(R.id.tvWelcome)
+        etSearch = findViewById(R.id.etSearch)
 
         tvWelcome.text = "Olá, $username!"
 
@@ -67,6 +72,14 @@ class TodoActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
+        etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                loadTodos()
+            }
+        })
+
         fabAdd.setOnClickListener {
             startActivity(Intent(this, AddEditTodoActivity::class.java).apply {
                 putExtra("USER_ID", userId)
@@ -85,7 +98,8 @@ class TodoActivity : AppCompatActivity() {
     }
 
     private fun loadTodos() {
-        val todos = todoDao.getAllByUser(userId)
+        val query = etSearch.text.toString().trim()
+        val todos = if (query.isEmpty()) todoDao.getAllByUser(userId) else todoDao.searchByUser(userId, query)
         adapter.submitList(todos)
         tvEmpty.visibility = if (todos.isEmpty()) View.VISIBLE else View.GONE
     }

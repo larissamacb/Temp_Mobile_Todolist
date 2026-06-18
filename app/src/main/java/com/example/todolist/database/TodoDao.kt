@@ -69,6 +69,33 @@ class TodoDao(context: Context) {
         return todos
     }
 
+    fun searchByUser(userId: Int, query: String): List<Todo> {
+        val db = dbHelper.readableDatabase
+        val todos = mutableListOf<Todo>()
+        val like = "%$query%"
+        val cursor = db.query(
+            DatabaseHelper.TABLE_TODOS, null,
+            "${DatabaseHelper.COL_TODO_USER_ID} = ? AND (${DatabaseHelper.COL_TODO_TITLE} LIKE ? OR ${DatabaseHelper.COL_TODO_DESCRIPTION} LIKE ?)",
+            arrayOf(userId.toString(), like, like),
+            null, null,
+            "${DatabaseHelper.COL_TODO_CREATED_AT} DESC"
+        )
+        while (cursor.moveToNext()) {
+            todos.add(
+                Todo(
+                    id = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_TODO_ID)),
+                    title = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_TODO_TITLE)),
+                    description = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_TODO_DESCRIPTION)) ?: "",
+                    isCompleted = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_TODO_COMPLETED)) == 1,
+                    createdAt = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_TODO_CREATED_AT)),
+                    userId = cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_TODO_USER_ID))
+                )
+            )
+        }
+        cursor.close()
+        return todos
+    }
+
     fun getById(todoId: Int): Todo? {
         val db = dbHelper.readableDatabase
         val cursor = db.query(
